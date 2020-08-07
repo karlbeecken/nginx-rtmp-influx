@@ -10,39 +10,59 @@ axios.get("http://onfire.live/stat").then((res) => {
     if (app.live.stream) {
       if (Array.isArray(app.live.stream)) {
         app.live.stream.forEach((stream) => {
-          console.log(app.name + "_" + stream.name);
-          console.log(stream);
+          const influx = new Influx.InfluxDB({
+            host: "localhost",
+            database: "rtmp",
+            schema: [
+              {
+                measurement: app.name,
+                fields: {
+                  name: Influx.FieldType.STRING,
+                  bitrate: Influx.FieldType.INTEGER,
+                },
+                tags: ["host"],
+              },
+            ],
+          });
+
+          influx.writePoints([
+            {
+              measurement: app.name,
+              tags: { host: os.hostname() },
+              fields: { name: stream.name, bitrate: stream.bw_in },
+            },
+          ]);
+
+          console.log(app.name + "_" + stream.name + ":" + stream.bw_in);
         });
       } else {
-        console.log(app.name + "_" + app.live.stream.name);
-        console.log(app.live.stream);
+        let stream = app.live.stream;
+
+        const influx = new Influx.InfluxDB({
+          host: "localhost",
+          database: "rtmp",
+          schema: [
+            {
+              measurement: app.name,
+              fields: {
+                name: Influx.FieldType.STRING,
+                bitrate: Influx.FieldType.INTEGER,
+              },
+              tags: ["host"],
+            },
+          ],
+        });
+
+        influx.writePoints([
+          {
+            measurement: app.name,
+            tags: { host: os.hostname() },
+            fields: { name: stream.name, bitrate: stream.bw_in },
+          },
+        ]);
+
+        console.log(app.name + "_" + stream.name + ":" + stream.bw_in);
       }
     }
   });
-  // res.data.data.forEach((val) => {
-  //   const influx = new Influx.InfluxDB({
-  //     host: "localhost",
-  //     database: "rtmp",
-  //     schema: [
-  //       {
-  //         measurement: val.name.replace(/ /gi, "_"),
-  //         fields: {
-  //           name: Influx.FieldType.STRING,
-  //           status: Influx.FieldType.INTEGER,
-  //           id: Influx.FieldType.INTEGER,
-  //         },
-  //         tags: ["host"],
-  //       },
-  //     ],
-  //   });
-
-  //   influx
-  //     .writePoints([
-  //       {
-  //         measurement: val.name.replace(/ /gi, "_"),
-  //         tags: { host: os.hostname() },
-  //         fields: { name: val.name, status: val.status, id: val.id },
-  //       },
-  //     ])
-  // });
 });
