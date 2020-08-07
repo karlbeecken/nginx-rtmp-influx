@@ -17,10 +17,9 @@ axios.get("http://onfire.live/stat").then((res) => {
               {
                 measurement: app.name,
                 fields: {
-                  name: Influx.FieldType.STRING,
                   bitrate: Influx.FieldType.INTEGER,
                 },
-                tags: ["host"],
+                tags: ["host", "name"],
               },
             ],
           });
@@ -28,8 +27,8 @@ axios.get("http://onfire.live/stat").then((res) => {
           influx.writePoints([
             {
               measurement: app.name,
-              tags: { host: os.hostname() },
-              fields: { name: stream.name, bitrate: stream.bw_in },
+              tags: { host: os.hostname(), name: stream.name },
+              fields: { bitrate: stream.bw_in },
             },
           ]);
 
@@ -45,10 +44,9 @@ axios.get("http://onfire.live/stat").then((res) => {
             {
               measurement: app.name,
               fields: {
-                name: Influx.FieldType.STRING,
                 bitrate: Influx.FieldType.INTEGER,
               },
-              tags: ["host"],
+              tags: ["host", "name"],
             },
           ],
         });
@@ -56,8 +54,8 @@ axios.get("http://onfire.live/stat").then((res) => {
         influx.writePoints([
           {
             measurement: app.name,
-            tags: { host: os.hostname() },
-            fields: { name: stream.name, bitrate: stream.bw_in },
+            tags: { host: os.hostname(), name: stream.name },
+            fields: { bitrate: stream.bw_in },
           },
         ]);
 
